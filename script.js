@@ -1,19 +1,43 @@
-const RSVP_STORAGE_KEY = "ziadHanaRsvps";
 const RSVP_RECIPIENT = "201116688965";
+const SUPABASE_URL = "https://utcsratghqeadxboauhu.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_8mhcy9BGU2bimmWeoZztMw_UzjfUm7N";
 let rsvpsCache = [];
 
 function readRsvps() {
     return rsvpsCache;
 }
 
-function loadRsvps() {
+async function loadRsvps() {
     try {
-        const saved = JSON.parse(localStorage.getItem(RSVP_STORAGE_KEY) || "[]");
-        rsvpsCache = Array.isArray(saved) ? saved : [];
+        const response = await supabaseRequest("rsvps?select=id,name,attending,guests,comment,created_at&order=created_at.asc");
+        rsvpsCache = response.map((rsvp) => ({
+            ...rsvp,
+            createdAt: rsvp.created_at
+        }));
     } catch (error) {
         rsvpsCache = [];
+        console.error(error);
     }
     updateAttendeeSummary();
+}
+
+async function supabaseRequest(path, options = {}) {
+    if (SUPABASE_URL.startsWith("PASTE_") || SUPABASE_ANON_KEY.startsWith("PASTE_")) {
+        throw new Error("Supabase configuration is missing.");
+    }
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        ...options,
+        headers: {
+            apikey: SUPABASE_ANON_KEY,
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            ...(options.headers || {})
+        }
+    });
+    if (!response.ok) {
+        throw new Error(`Supabase request failed: ${response.status}`);
+    }
+    return response.status === 204 ? null : response.json();
 }
 
 function getAttendeeCount(rsvps) {
@@ -22,7 +46,7 @@ function getAttendeeCount(rsvps) {
         .reduce((total, rsvp) => total + Number(rsvp.guests || 0), 0);
 }
 
-function saveRsvp(attending) {
+async function saveRsvp(attending) {
     const box = document.getElementById(attending === "yes" ? "yesBox" : "noBox");
     const nameInput = box?.querySelector("input");
 
@@ -41,10 +65,20 @@ function saveRsvp(attending) {
     };
 
     try {
-        rsvpsCache = [...rsvpsCache, rsvp];
-        localStorage.setItem(RSVP_STORAGE_KEY, JSON.stringify(rsvpsCache));
+        await supabaseRequest("rsvps", {
+            method: "POST",
+            headers: { Prefer: "return=minimal" },
+            body: JSON.stringify({
+                name: rsvp.name,
+                attending: rsvp.attending,
+                guests: rsvp.guests,
+                comment: rsvp.comment,
+                created_at: rsvp.createdAt
+            })
+        });
+        await loadRsvps();
     } catch (error) {
-        alert("Your RSVP could not be saved in this browser.");
+        alert("The RSVP service is not configured or unavailable.");
         return;
     }
 
@@ -103,6 +137,7 @@ function startMusic() {
     if (!music) {
         return;
     }
+
     if (music.readyState === 0) {
         music.load();
     }
