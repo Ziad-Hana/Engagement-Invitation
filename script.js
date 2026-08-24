@@ -44,7 +44,11 @@ async function supabaseRequest(path, options = {}) {
         }
         throw new Error(details || `Supabase request failed: ${response.status}`);
     }
-    return response.status === 204 ? null : response.json();
+    if (response.status === 204) {
+        return null;
+    }
+    const responseText = await response.text();
+    return responseText ? JSON.parse(responseText) : null;
 }
 
 function getAttendeeCount(rsvps) {
