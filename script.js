@@ -69,7 +69,7 @@ function sendRsvpMessage(rsvp) {
     const status = rsvp.attending === "yes" ? "Yes, we are coming" : "Sorry, we cannot attend";
     const confirmedGuests = getAttendeeCount(readRsvps());
     const message = [
-        "Ziad & Hana RSVP",
+        "Ziad & Hana Engagement Invitation",
         `Name: ${rsvp.name}`,
         `Response: ${status}`,
         rsvp.attending === "yes" ? `Total people attending: ${rsvp.guests}` : null,
