@@ -1,4 +1,3 @@
-const RSVP_RECIPIENT = "201116688965";
 const SUPABASE_URL = "https://utcsratghqeadxboauhu.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_8mhcy9BGU2bimmWeoZztMw_UzjfUm7N";
 let rsvpsCache = [];
@@ -89,31 +88,12 @@ async function saveRsvp(attending) {
     }
     alert(attending === "yes" ? "Your attendance was saved. Thank you!" : "Thank you for letting us know.");
     updateAttendeeSummary();
-    sendRsvpMessage(rsvp);
 }
 
 function updateAttendeeSummary() {
     const count = document.getElementById("attendeeCount");
     if (count) {
         count.innerText = getAttendeeCount(readRsvps());
-    }
-}
-
-function sendRsvpMessage(rsvp) {
-    const status = rsvp.attending === "yes" ? "Yes, we are coming" : "Sorry, we cannot attend";
-    const confirmedGuests = getAttendeeCount(readRsvps());
-    const message = [
-        "Ziad & Hana Engagement Invitation",
-        `Name: ${rsvp.name}`,
-        `Response: ${status}`,
-        rsvp.attending === "yes" ? `Total people attending: ${rsvp.guests}` : null,
-        rsvp.comment ? `Message: ${rsvp.comment}` : null,
-        `Confirmed guests so far: ${confirmedGuests}`
-    ].filter(Boolean).join("\n");
-    const messageUrl = `https://wa.me/${RSVP_RECIPIENT}?text=${encodeURIComponent(message)}`;
-    const messageWindow = window.open(messageUrl, "_blank", "noopener,noreferrer");
-    if (!messageWindow) {
-        window.location.href = messageUrl;
     }
 }
 
