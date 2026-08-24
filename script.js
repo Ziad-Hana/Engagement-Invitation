@@ -103,8 +103,11 @@ function startMusic() {
     if (!music) {
         return;
     }
-
-    music.play().catch(() => updateMusicButton());
+    if (music.readyState === 0) {
+        music.load();
+    }
+    const playback = music.play();
+    playback?.catch(() => updateMusicButton());
 }
 
 function pauseMusic() {
