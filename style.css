@@ -1,0 +1,84 @@
+/* Shared media and accessibility helpers for the invitation pages. */
+
+img {
+    max-width: 100%;
+}
+
+.music-toggle {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 9500;
+    width: 56px;
+    height: 56px;
+    border: 1px solid #d8e5c8;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2c3a2e, #5c4033);
+    color: #fffdf8;
+    cursor: pointer;
+    box-shadow: 0 0 8px #d8e5c8, 0 0 20px rgba(145, 167, 125, .55);
+}
+
+.music-toggle.is-playing {
+    box-shadow: 0 0 12px #d8e5c8, 0 0 30px rgba(145, 167, 125, .8);
+}
+
+.photo {
+    display: block;
+    width: 100%;
+    height: clamp(220px, 42vw, 520px);
+    object-fit: cover;
+    object-position: center;
+    image-rendering: auto;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    filter: saturate(1.04) contrast(1.02);
+    border-radius: 18px;
+    margin: 18px 0;
+    will-change: transform;
+    transition: filter .35s ease, transform .35s ease;
+}
+
+.photo:hover {
+    filter: saturate(1.08) contrast(1.03);
+    transform: translateZ(0) scale(1.01);
+}
+
+.photo[alt="L'Amour Palace Hall"] {
+    aspect-ratio: 3 / 2;
+    object-position: center 48%;
+}
+
+.photo[alt="Ziad and Hana"] {
+    height: clamp(320px, 58vw, 680px);
+    aspect-ratio: 3 / 4;
+    object-position: center 35%;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .photo {
+        height: clamp(190px, 58vw, 330px);
+        border-radius: 12px;
+    }
+
+    .photo[alt="Ziad and Hana"] {
+        height: clamp(280px, 92vw, 460px);
+    }
+}
+
