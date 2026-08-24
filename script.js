@@ -13,11 +13,12 @@ async function loadRsvps() {
             ...rsvp,
             createdAt: rsvp.created_at
         }));
+        updateAttendeeSummary();
+        return true;
     } catch (error) {
-        rsvpsCache = [];
         console.error(error);
+        return false;
     }
-    updateAttendeeSummary();
 }
 
 async function supabaseRequest(path, options = {}) {
@@ -34,7 +35,14 @@ async function supabaseRequest(path, options = {}) {
         }
     });
     if (!response.ok) {
-        throw new Error(`Supabase request failed: ${response.status}`);
+        let details = "";
+        try {
+            const errorBody = await response.json();
+            details = errorBody.message || errorBody.error || "";
+        } catch (error) {
+            details = "";
+        }
+        throw new Error(details || `Supabase request failed: ${response.status}`);
     }
     return response.status === 204 ? null : response.json();
 }
@@ -75,9 +83,12 @@ async function saveRsvp(attending) {
                 created_at: rsvp.createdAt
             })
         });
-        await loadRsvps();
+        if (!await loadRsvps()) {
+            throw new Error("The RSVP was saved, but the shared counter could not be refreshed.");
+        }
     } catch (error) {
-        alert("The RSVP service is not configured or unavailable.");
+        console.error(error);
+        alert(`The RSVP could not be saved: ${error.message}`);
         return;
     }
 
