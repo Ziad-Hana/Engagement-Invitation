@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In | Ziad & Hana</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+    min-height: 100vh;
+    padding: 24px 16px;
+    background: radial-gradient(circle at top, #fffdf8 0, #f4efe6 48%, #e8dfd0 100%);
+    color: #2c3a2e;
+    font-family: Montserrat, sans-serif;
+}
+
+.login-page {
+    max-width: 440px;
+    margin: 9vh auto;
+}
+
+.login-card {
+    position: relative;
+    padding: 42px 38px 34px;
+    background: rgba(255, 253, 248, .94);
+    border: 1px solid rgba(92, 64, 51, .2);
+    border-radius: 12px;
+    box-shadow: 0 22px 50px rgba(44, 58, 46, .14), inset 0 1px 0 rgba(255, 255, 255, .9);
+    text-align: center;
+}
+
+.login-card::before {
+    content: "";
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    width: 42px;
+    height: 2px;
+    background: #91a77d;
+    transform: translateX(-50%);
+}
+
+.eyebrow {
+    color: #5c4033;
+    font: 600 .7rem Cinzel, serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.login-card h1 {
+    margin: 12px 0 8px;
+    color: #5c4033;
+    font: 400 clamp(3rem, 12vw, 4.2rem) Great Vibes, cursive;
+    line-height: 1;
+}
+
+.login-card p {
+    max-width: 330px;
+    margin: 0 auto 28px;
+    color: #68755a;
+    font-size: .84rem;
+    line-height: 1.7;
+}
+
+.login-card form {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.login-card label {
+    display: block;
+    margin: 16px 0 7px;
+    color: #5c4033;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .4px;
+}
+
+.login-card input,
+.login-card button {
+    display: block;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.login-card input {
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid rgba(92, 64, 51, .24);
+    border-radius: 6px;
+    outline: 0;
+    background: #fffdf8;
+    color: #2c3a2e;
+    font: .85rem Montserrat, sans-serif;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.login-card input:focus {
+    border-color: #91a77d;
+    box-shadow: 0 0 0 3px rgba(145, 167, 125, .2);
+}
+
+.login-card button {
+    min-height: 48px;
+    margin-top: 24px;
+    border: 1px solid #5c4033;
+    border-radius: 6px;
+    background: #5c4033;
+    color: #fffdf8;
+    font: 700 .74rem Montserrat, sans-serif;
+    letter-spacing: .3px;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.login-card button:hover {
+    background: #2c3a2e;
+    box-shadow: 0 8px 18px rgba(44, 58, 46, .18);
+    transform: translateY(-1px);
+}
+
+.login-card button:active {
+    transform: translateY(0);
+}
+
+.message {
+    min-height: 24px;
+    margin: 18px auto 0 !important;
+    color: #5c4033 !important;
+    font-size: .78rem !important;
+}
+
+.back {
+    display: inline-block;
+    margin-top: 18px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #91a77d;
+    color: #2c3a2e;
+    font-size: .78rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+@media (max-width: 520px) {
+    .login-page {
+        margin: 5vh auto;
+    }
+
+    .login-card {
+        padding: 38px 22px 28px;
+    }
+}
+</style>
+</head>
+<body>
+<main class="login-page">
+<section class="login-card">
+    <div class="eyebrow">Ziad & Hana</div>
+    <h1>Private Messages</h1>
+    <p>Sign in to view your RSVP. Administrators can use their admin account to view all responses.</p>
+    <form id="loginForm">
+        <label for="email">Email address</label>
+        <input id="email" type="email" autocomplete="email" required>
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password">
+        <button type="submit">Sign in as admin</button>
+    </form>
+    <p class="message" id="message" role="status"></p>
+    <a class="back" href="index.html">Back to invitation</a>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="auth.js"></script>
+<script>
+const message = document.getElementById("message");
+const nextPage = new URLSearchParams(window.location.search).get("next") || "comments.html";
+
+supabaseClient.auth.signOut();
+
+function showMessage(text) {
+    message.innerText = text;
+}
+
+document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: document.getElementById("email").value.trim(),
+        password: document.getElementById("password").value
+    });
+    if (error) {
+        showMessage(error.message);
+        return;
+    }
+    if (data.user.app_metadata?.is_admin !== true) {
+        await supabaseClient.auth.signOut();
+        showMessage("This account is not an administrator account.");
+        return;
+    }
+    window.location.href = nextPage;
+});
+</script>
+</body>
+</html>
