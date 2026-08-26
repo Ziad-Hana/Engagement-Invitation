@@ -24,7 +24,6 @@ auth.js                            Shared Supabase client and API helper
 script.js                          RSVP, music, countdown, and page behavior
 style.css                          Shared media and accessibility styles
 media/                             Invitation photos and music
-supabase/migrations/               Database security migration
 ```
 
 ## Supabase Setup
